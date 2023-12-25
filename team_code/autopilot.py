@@ -18,7 +18,7 @@ import carla
 from srunner.scenariomanager.carla_data_provider import CarlaDataProvider
 from leaderboard.autoagents import autonomous_agent, autonomous_agent_local
 from nav_planner import PIDController, RoutePlanner, interpolate_trajectory, extrapolate_waypoint_route
-from config import GlobalConfig
+from team_code.config import GlobalConfig
 import transfuser_utils as t_u
 from scenario_logger import ScenarioLogger
 

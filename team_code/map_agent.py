@@ -19,7 +19,7 @@ import math
 
 from leaderboard.autoagents import autonomous_agent
 from model import LidarCenterNet
-from config import GlobalConfig
+from team_code.config import GlobalConfig
 from data import CARLA_Data
 from nav_planner import RoutePlanner
 from nav_planner import extrapolate_waypoint_route
@@ -31,11 +31,10 @@ from scenario_logger import ScenarioLogger
 import transfuser_utils as t_u
 
 from agents.navigation.global_route_planner import GlobalRoutePlanner
-from agents.navigation.global_route_planner_dao import GlobalRoutePlannerDAO
 import xml.etree.ElementTree as ET
 
 import pathlib
-import pickle
+import jsonpickle
 import ujson  # Like json but faster
 import gzip
 
@@ -61,9 +60,8 @@ def interpolate_trajectory(world_map, waypoints_trajectory, hop_resolution=1.0, 
       - hop_resolution: is the resolution, how dense is the provided trajectory going to be made
   """
 
-  dao = GlobalRoutePlannerDAO(world_map, hop_resolution)
-  grp = GlobalRoutePlanner(dao)
-  grp.setup()
+  grp = GlobalRoutePlanner(world_map, hop_resolution)
+
   # Obtain route plan
   route = []
   for i in range(len(waypoints_trajectory) - 1):  # Goes until the one before the last.
@@ -163,8 +161,8 @@ class MapAgent(autonomous_agent.AutonomousAgent):
     self.device = torch.device('cuda:0')
 
     # Load the config saved during training
-    with open(os.path.join(path_to_conf_file, 'config.pickle'), 'rb') as args_file:
-      loaded_config = pickle.load(args_file)
+    with open(os.path.join(path_to_conf_file, 'config.json'), 'r') as args_file:
+      loaded_config = jsonpickle.decode(args_file.read())
 
     # Generate new config for the case that it has new variables.
     self.config = GlobalConfig()
@@ -663,9 +661,14 @@ class MapAgent(autonomous_agent.AutonomousAgent):
         pred_target_speed_index = torch.argmax(pred_target_speed)
         pred_target_speed = self.config.target_speeds[pred_target_speed_index]
 
+    
+    print(self.config.inference_direct_controller)
+    print(self.config.use_controller_input_prediction)
+    print(self.config.use_wp_gru)
+
     if self.config.inference_direct_controller and self.config.use_controller_input_prediction:
       steer, throttle, brake = self.nets[0].control_pid_direct(pred_target_speed, tick_data['angle'], gt_velocity)
-    elif self.config.use_wp_gru and not self.config.inference_direct_controller:
+    elif self.config.use_wp_gru == 1 and not (hasattr(self.config, 'inference_direct_controller') and self.config.inference_direct_controller):
       steer, throttle, brake = self.nets[0].control_pid(self.pred_wp, gt_velocity)
     else:
       raise ValueError('An output representation was chosen that was not trained.')

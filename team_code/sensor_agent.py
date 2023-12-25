@@ -18,7 +18,7 @@ import math
 
 from leaderboard.autoagents import autonomous_agent
 from model import LidarCenterNet
-from config import GlobalConfig
+from team_code.config import GlobalConfig
 from data import CARLA_Data
 from nav_planner import RoutePlanner
 from nav_planner import extrapolate_waypoint_route
@@ -30,7 +30,7 @@ from scenario_logger import ScenarioLogger
 import transfuser_utils as t_u
 
 import pathlib
-import pickle
+import jsonpickle
 import ujson  # Like json but faster
 import gzip
 
@@ -62,8 +62,8 @@ class SensorAgent(autonomous_agent.AutonomousAgent):
     self.device = torch.device('cuda:0')
 
     # Load the config saved during training
-    with open(os.path.join(path_to_conf_file, 'config.pickle'), 'rb') as args_file:
-      loaded_config = pickle.load(args_file)
+    with open(os.path.join(path_to_conf_file, 'config.json'), 'r') as args_file:
+      loaded_config = jsonpickle.decode(args_file.read())
 
     # Generate new config for the case that it has new variables.
     self.config = GlobalConfig()
@@ -553,7 +553,7 @@ class SensorAgent(autonomous_agent.AutonomousAgent):
 
     if self.config.inference_direct_controller and self.config.use_controller_input_prediction:
       steer, throttle, brake = self.nets[0].control_pid_direct(pred_target_speed, pred_angle, gt_velocity)
-    elif self.config.use_wp_gru and not self.config.inference_direct_controller:
+    elif self.config.use_wp_gru and not (hasattr(self.config, 'inference_direct_controller') and self.config.inference_direct_controller):
       steer, throttle, brake = self.nets[0].control_pid(self.pred_wp, gt_velocity)
     else:
       raise ValueError('An output representation was chosen that was not trained.')

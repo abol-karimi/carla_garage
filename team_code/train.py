@@ -21,7 +21,7 @@ from torch.distributed.elastic.multiprocessing.errors import record
 from torch.distributed.optim import ZeroRedundancyOptimizer
 import torch.multiprocessing as mp
 
-from config import GlobalConfig
+from team_code.config import GlobalConfig
 from model import LidarCenterNet
 from data import CARLA_Data
 from plant import PlanT

@@ -15,7 +15,7 @@ import cv2
 import numpy as np
 
 import carla
-from config import GlobalConfig
+from team_code.config import GlobalConfig
 import transfuser_utils as t_u
 
 SAVE_PATH = os.environ.get('SAVE_PATH', None)

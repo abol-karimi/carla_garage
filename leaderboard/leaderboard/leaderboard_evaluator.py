@@ -15,10 +15,8 @@ from __future__ import print_function
 import traceback
 import argparse
 from argparse import RawTextHelpFormatter
-from distutils.version import LooseVersion
 import importlib
 import os
-import pkg_resources
 import sys
 import carla
 import signal
@@ -78,14 +76,9 @@ class LeaderboardEvaluator(object):
         # Setup the simulation
         self.client, self.client_timeout, self.traffic_manager = self._setup_simulation(args)
 
-        dist = pkg_resources.get_distribution("carla")
-        if dist.version != 'leaderboard':
-            if LooseVersion(dist.version) < LooseVersion('0.9.10'):
-                raise ImportError("CARLA version 0.9.10.1 or newer required. CARLA version found: {}".format(dist))
-
         # Load agent
         module_name = os.path.basename(args.agent).split('.')[0]
-        sys.path.insert(0, os.path.dirname(args.agent))
+        # sys.path.insert(0, os.path.dirname(args.agent))
         self.module_agent = importlib.import_module(module_name)
 
         # Create the ScenarioManager
@@ -174,8 +167,7 @@ class LeaderboardEvaluator(object):
         settings = carla.WorldSettings(
             synchronous_mode = True,
             fixed_delta_seconds = 1.0 / self.frame_rate,
-            deterministic_ragdolls = True,
-            spectator_as_ego = False
+            deterministic_ragdolls = True
         )
         client.get_world().apply_settings(settings)
 
@@ -197,7 +189,6 @@ class LeaderboardEvaluator(object):
             settings.synchronous_mode = False
             settings.fixed_delta_seconds = None
             settings.deterministic_ragdolls = False
-            settings.spectator_as_ego = True
             self.world.apply_settings(settings)
 
             # Make the TM back to async

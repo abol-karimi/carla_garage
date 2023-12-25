@@ -16,7 +16,7 @@ import gzip
 from tqdm import tqdm
 from copy import deepcopy
 import numpy as np
-from config import GlobalConfig
+from team_code.config import GlobalConfig
 from data import CARLA_Data
 import pickle
 import random

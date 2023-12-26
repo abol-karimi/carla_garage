@@ -1,3 +1,6 @@
 [submodule "leaderboard"]
 	path = leaderboard
 	url = https://github.com/abol-karimi/leaderboard.git
+[submodule "scenario_runner"]
+	path = scenario_runner
+	url = https://github.com/abol-karimi/scenario_runner.git

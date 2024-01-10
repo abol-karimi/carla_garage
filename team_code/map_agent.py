@@ -662,10 +662,6 @@ class MapAgent(autonomous_agent.AutonomousAgent):
         pred_target_speed = self.config.target_speeds[pred_target_speed_index]
 
     
-    print(self.config.inference_direct_controller)
-    print(self.config.use_controller_input_prediction)
-    print(self.config.use_wp_gru)
-
     if self.config.inference_direct_controller and self.config.use_controller_input_prediction:
       steer, throttle, brake = self.nets[0].control_pid_direct(pred_target_speed, tick_data['angle'], gt_velocity)
     elif self.config.use_wp_gru == 1 and not (hasattr(self.config, 'inference_direct_controller') and self.config.inference_direct_controller):
